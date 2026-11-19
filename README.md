@@ -22,18 +22,27 @@ most farms don't have.
 Every day (and whenever the farmer asks), the Field Resilience Agent runs a monitoring cycle for each field:
 
 ```
- 1. Observe     → field profile, past actions and their outcomes
- 2. Verify      → is the evidence fresh? do the sources agree? refresh stale sources
- 3. Assess      → soil moisture · drought risk · crop health · weather outlook · trends
- 4. Plan        → propose an action: irrigate · wait for rain · inspect a zone · collect sensor evidence
- 5. Check       → safety policy validates every proposal (evidence, confidence, water amount)
- 6. Ask         → consequential actions wait for the farmer's Yes/No
- 7. Notify      → one plain-language message per check (Telegram or SMS)
- 8. Evaluate    → after an action, compare the outcome and re-plan
+ 1. Observe           → field profile, past actions and their outcomes
+ 2. Validate          → is the evidence fresh? do the sources agree? refresh stale sources
+ 3. Diagnose          → soil moisture · drought risk · crop health · weather outlook · trends
+ 4. Plan              → choose an action: irrigate · wait for rain · inspect a zone · collect sensor evidence
+ 5. Propose           → the safety policy validates every proposal (evidence, confidence, water amount)
+ 6. Notify farmer     → one plain-language message per check (Telegram or SMS)
+ 7. Farmer approval   → consequential actions wait for the farmer's Yes/No
+ 8. Monitor outcome   → after an action, compare the outcome and re-plan
 ```
 
 Each proposed action carries its **evidence, assumptions, confidence and water requirement**, so the farmer
 always sees why the agent is recommending it.
+
+## Screenshots
+
+| Chat | Field status | How the agent decided |
+|---|---|---|
+| ![Farmer chat](docs/screenshots/assistant-chat.png) | ![Field status with a Yes/No request](docs/screenshots/assistant-field-status.png) | ![Agent cycle details](docs/screenshots/assistant-agent-details.png) |
+| Farmers ask in plain words. Answers use live field data through read-only tools. | One status card, one question, the last message sent. | The details view shows each stage of the agent cycle. |
+
+*Contact details in the screenshots are replaced with placeholders.*
 
 ## Architecture
 
@@ -105,12 +114,32 @@ backend/
   agent/              agent code (runner, policy, tools, evidence, alerts, chat, providers…)
   routes/agent.py     FastAPI routes
   alembic/versions/   database migrations for the agent tables
+  tests/              unit tests for policy, alerts, chat and provider fallback
   .env.example        configuration keys (no secrets)
   requirements.txt
 frontend/
   src/components/assistant/AssistantLauncher.tsx   assistant window (Chat + Field status)
   src/components/agent/FieldAgentPanel.tsx         farmer-facing agent panel
   src/components/agent/fieldAgentApi.ts            typed API client
+```
+
+## Tests
+
+35 unit tests cover the parts that must be predictable:
+
+| File | What it checks |
+|---|---|
+| `test_field_agent_policy.py` (14) | Safety policy: irrigation needs the planner and forecast, water can't exceed the planner or farmer cap, forecast rain or low confidence blocks irrigation, stale moisture forces a refresh, unknown zones are rejected; evidence freshness; outcome judgement |
+| `test_field_agent_alerts.py` (13) | Farmer messages: rain, drought, crop health and decision warnings, check status, next check in farm time, plain-text SMS, Telegram formatting, channel choice, phone normalization and masking |
+| `test_field_agent_chat.py` (4) | Chat: history capping, rate limit, tools are read-only, Gemini answers when Groq fails |
+| `test_field_agent_gemini.py` (4) | Gemini client: schema sanitizing, function declarations, multi-turn tool calls, ignoring thought parts |
+
+They use the standard library `unittest` and run inside the full AgriLens platform:
+
+```bash
+python -m unittest tests.test_field_agent_policy tests.test_field_agent_alerts \
+                   tests.test_field_agent_chat tests.test_field_agent_gemini
+# Ran 35 tests … OK
 ```
 
 ## Not included
