@@ -1,21 +1,38 @@
 # AgriLens Atlantic: Field Resilience Agent
 
-**Agentic AI that watches farm fields for drought and tells farmers, in plain words, whether to water today.**
+**AgriLens turns satellite, weather and soil data into one clear answer for each field: how healthy the crop
+is, where stress is building, how drought is developing, and when to water.** This repository contains its
+agentic AI layer, the **Field Resilience Agent**, which checks every field every day and turns those insights
+into action.
+
+*Every drop, justified.*
 
 Submitted to the **Cognizant BrAInstorm Challenge 2026: Agentic AI for Good**.
 
 > **Code preview, all rights reserved.** This repository contains the agentic AI layer of AgriLens
 > (the agent, the farmer assistant and the chat). It is shared for evaluation only. The core AgriLens
-> analysis engines (satellite, soil moisture, drought, crop health and irrigation scheduling) are
+> analysis engines (crop health and stress, soil moisture, drought risk, weather and irrigation scheduling) are
 > proprietary and **not included**. See [LICENSE](LICENSE).
 
 ---
 
 ## The problem
 
-Farms in Atlantic Canada face more frequent dry spells. Farmers have satellite, weather and soil data available,
-but turning it into a daily decision ("water now, wait for rain, or check a zone?") takes time and expertise
-most farms don't have.
+Prince Edward Island grows about a quarter of Canada's potatoes, and all of its drinking water comes from
+groundwater. Yet crop care and irrigation are still decided by eye and by calendar. The data that could help
+already exists, but it's buried in satellite imagery, weather models and charts that no farmer has time to read.
+A wrong call means a lost crop, or water pumped away from a supply the whole island shares.
+
+## AgriLens
+
+AgriLens turns complex datasets into useful decisions, field by field. A farmer draws a field once, and AgriLens
+watches it using satellite imagery, soil-moisture models and live forecasts. It sums everything up in four simple
+scores: **moisture, drought risk, crop health and irrigation need**. Detailed views show where the crop is under stress
+and whether that stress is spreading or recovering, how fast the soil is drying, and how drought is developing over
+time. It covers all of Atlantic Canada and runs on free, open data, so a family farm gets the same intelligence as
+the largest operation.
+
+**The Field Resilience Agent** (this repository) is the part that acts on those insights.
 
 ## What the agent does
 
@@ -144,8 +161,9 @@ python -m unittest tests.test_field_agent_policy tests.test_field_agent_alerts \
 
 ## Not included
 
-The full AgriLens platform (satellite processing with Sentinel-2 and Google Earth Engine, soil moisture,
-drought scoring, crop health and stress, irrigation scheduling, maps and dashboard) is proprietary.
+The full AgriLens field intelligence platform is proprietary. That covers crop health and stress analysis
+(Sentinel-2 via Google Earth Engine), soil moisture detection, drought risk tracking, irrigation scheduling,
+weather, Atlantic province coverage, Operations monitoring, and the maps and dashboard.
 `agent/tools.py` imports those services by name. This repository is a **code preview** and is not meant to run
 on its own.
 
